@@ -1,0 +1,62 @@
+project(strigi_soprano_indexer)
+
+include(SopranoAddOntology)
+
+include_directories( 
+  ${STRIGI_INCLUDE_DIR}
+  ${SOPRANO_INCLUDE_DIR}
+  ${CLUCENE_LIBRARY_DIR}
+  ${CLUCENE_INCLUDE_DIR}
+)
+
+set( strigi_soprano_indexer_SRCS
+  sopranoindexmanager.cpp
+  sopranoindexreader.cpp
+  sopranoindexwriter.cpp
+  util.cpp
+  tstring.cpp
+)
+
+soprano_add_ontology(strigi_soprano_indexer_SRCS
+  ${nepomukontologies_SOURCE_DIR}/nfo.trig
+  "NFO"
+  "Nepomuk::Vocabulary"
+  "trig")
+soprano_add_ontology(strigi_soprano_indexer_SRCS
+  ${nepomukontologies_SOURCE_DIR}/nie.trig
+  "NIE"
+  "Nepomuk::Vocabulary"
+  "trig")
+
+# CLucene requires exception support
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${KDE4_ENABLE_EXCEPTIONS}")
+
+if(WIN32)
+  # this is needed to have mingw, cygwin and msvc libs installed in one directory
+  if(MSVC)
+    set(prefix msvc_strigiindex_)
+  elseif(CYGWIN)
+    set(prefix cyg_strigiindex_)
+  elseif(MINGW)
+    set(prefix mingw_strigiindex_)
+  endif(MSVC)
+else(WIN32)
+  set(prefix strigiindex_)
+endif(WIN32)
+
+kde4_add_library(sopranobackend MODULE ${strigi_soprano_indexer_SRCS})
+
+set_target_properties(sopranobackend PROPERTIES PREFIX ${prefix})
+
+target_link_libraries(sopranobackend
+  ${STRIGI_STREAMANALYZER_LIBRARY}
+  ${NEPOMUK_LIBRARIES}
+  ${SOPRANO_LIBRARIES}
+  ${SOPRANO_CLIENT_LIBRARIES}
+  ${SOPRANO_INDEX_LIBRARIES}
+  ${QT_QTCORE_LIBRARY}
+  ${CLUCENE_LIBRARY}
+  ${KDE4_KDECORE_LIBS}
+)
+
+install(TARGETS sopranobackend LIBRARY DESTINATION ${LIB_INSTALL_DIR}/strigi)

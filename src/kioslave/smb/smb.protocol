@@ -1,0 +1,14 @@
+[Protocol]
+exec=kio_smb
+protocol=smb
+input=none
+output=filesystem
+listing=Name,Type,Size,Date,Access,Owner,Group
+reading=true
+writing=true
+makedir=true
+deleting=true
+opening=true
+moving=true
+X-DocPath=kioslave/smb/index.html
+Icon=network-workgroup
